@@ -216,3 +216,80 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+
+# ==========================================
+# Python & Tooling (uv, pytest, venv)
+# ==========================================
+.venv/
+venv/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Pytest & Coverage Cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# MyPy & Typechecking Cache
+.mypy_cache/
+.ruff_cache/
+
+
+# ==========================================
+# C / C++ (Build Artifacts & Executables)
+# ==========================================
+*.o
+*.obj
+*.so
+*.dylib
+*.dll
+*.a
+*.lib
+*.exe
+*.out
+
+# Exclude all compiled binary outputs in build folders
+bin/
+build/
+CMakeCache.txt
+CMakeFiles/
+
+
+# ==========================================
+# Rust (Cargo Build Directory)
+# ==========================================
+/rust/**/target/
+**/*.rs.bk
+
+
+# ==========================================
+# Editors & OS (VS Code, Linux, Windows)
+# ==========================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Windows & macOS System Files
+.DS_Store
+Thumbs.db
+
+# ==========================================
+# Python & uv Tooling
+# ==========================================
+# Environments and uv internal cache
+.venv/
+.uv/
+
+# Python Bytecode
+__pycache__/
+*.py[cod]
+
+# Pytest & Tooling Caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
