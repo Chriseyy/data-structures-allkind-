@@ -1,7 +1,7 @@
-class AllSortingAlgorithms:
-    """Implementations of some sorting algorithms."""
+class AllSortingAndSearchingAlgorithms:
+    """Implementations of Sorting Algorithms + 2 Searching Algorithms."""
 
-    # --- 1. BUBBLE SORT O(n^2) ---
+# --- 1. BUBBLE SORT O(n^2) ---
     @staticmethod
     def bubble_sort(arr: list[int]) -> list[int]:
         """Bubble Sort: Repeatedly swaps adjacent elements if they are in wrong order."""
@@ -14,7 +14,6 @@ class AllSortingAlgorithms:
                 if a[j] > a[j + 1]:
                     a[j], a[j + 1] = a[j + 1], a[j]
                     swapped = True
-            # Early exit if array is already sorted
             if not swapped:
                 break
                 
@@ -32,7 +31,6 @@ class AllSortingAlgorithms:
             for j in range(i + 1, n):
                 if a[j] < a[min_idx]:
                     min_idx = j
-            # Swap minimum element with first unsorted position
             a[i], a[min_idx] = a[min_idx], a[i]
             
         return a
@@ -61,10 +59,10 @@ class AllSortingAlgorithms:
             return arr
             
         mid = len(arr) // 2
-        left = AllSortingAlgorithms.merge_sort(arr[:mid])
-        right = AllSortingAlgorithms.merge_sort(arr[mid:])
+        left = AllSortingAndSearchingAlgorithms.merge_sort(arr[:mid])
+        right = AllSortingAndSearchingAlgorithms.merge_sort(arr[mid:])
         
-        return AllSortingAlgorithms._merge(left, right)
+        return AllSortingAndSearchingAlgorithms._merge(left, right)
 
     @staticmethod
     def _merge(left: list[int], right: list[int]) -> list[int]:
@@ -97,9 +95,9 @@ class AllSortingAlgorithms:
         right = [x for x in arr if x > pivot]
         
         return (
-            AllSortingAlgorithms.quick_sort(left)
+            AllSortingAndSearchingAlgorithms.quick_sort(left)
             + middle
-            + AllSortingAlgorithms.quick_sort(right)
+            + AllSortingAndSearchingAlgorithms.quick_sort(right)
         )
 
     # --- 6. HEAP SORT O(n log n) ---
@@ -109,14 +107,12 @@ class AllSortingAlgorithms:
         a = arr.copy()
         n = len(a)
         
-        # Build Max-Heap (re-arrange array)
         for i in range(n // 2 - 1, -1, -1):
-            AllSortingAlgorithms._heapify(a, n, i)
+            AllSortingAndSearchingAlgorithms._heapify(a, n, i)
             
-        # Extract elements one by one from heap
         for i in range(n - 1, 0, -1):
-            a[i], a[0] = a[0], a[i]  # Move current root to end
-            AllSortingAlgorithms._heapify(a, i, 0)  # Heapify reduced heap
+            a[i], a[0] = a[0], a[i]
+            AllSortingAndSearchingAlgorithms._heapify(a, i, 0)
             
         return a
 
@@ -135,7 +131,7 @@ class AllSortingAlgorithms:
             
         if largest != i:
             arr[i], arr[largest] = arr[largest], arr[i]
-            AllSortingAlgorithms._heapify(arr, n, largest)
+            AllSortingAndSearchingAlgorithms._heapify(arr, n, largest)
 
     # --- 7. TIMSORT O(n log n) [Python Default] ---
     @staticmethod
@@ -144,12 +140,10 @@ class AllSortingAlgorithms:
         a = arr.copy()
         n = len(a)
 
-        # Step 1: Sort small individual subarrays of size 'run_size' using Insertion Sort
         for start in range(0, n, run_size):
             end = min(start + run_size - 1, n - 1)
-            AllSortingAlgorithms._insertion_sort_range(a, start, end)
+            AllSortingAndSearchingAlgorithms._insertion_sort_range(a, start, end)
 
-        # Step 2: Start merging the sorted runs (doubling size each pass: 32 -> 64 -> 128...)
         size = run_size
         while size < n:
             for left in range(0, n, 2 * size):
@@ -157,7 +151,7 @@ class AllSortingAlgorithms:
                 right = min(left + 2 * size - 1, n - 1)
 
                 if mid < right:
-                    AllSortingAlgorithms._merge_in_place(a, left, mid, right)
+                    AllSortingAndSearchingAlgorithms._merge_in_place(a, left, mid, right)
 
             size *= 2
 
@@ -201,3 +195,107 @@ class AllSortingAlgorithms:
             arr[k] = right_sub[j]
             j += 1
             k += 1
+
+    # --- 8. COUNTING SORT O(n + k) [Non-Comparison] ---
+    @staticmethod
+    def counting_sort(arr: list[int]) -> list[int]:
+        """Counting Sort: Non-comparison integer sorting algorithm."""
+        if not arr:
+            return []
+
+        min_val = min(arr)
+        max_val = max(arr)
+        range_of_elements = max_val - min_val + 1
+
+        count = [0] * range_of_elements
+        output = [0] * len(arr)
+
+        for num in arr:
+            count[num - min_val] += 1
+
+        for i in range(1, len(count)):
+            count[i] += count[i - 1]
+
+        for i in range(len(arr) - 1, -1, -1):
+            output[count[arr[i] - min_val] - 1] = arr[i]
+            count[arr[i] - min_val] -= 1
+
+        return output
+
+    # --- 9. RADIX SORT O(d * (n + k)) [Non-Comparison] ---
+    @staticmethod
+    def radix_sort(arr: list[int]) -> list[int]:
+        """Radix Sort: Digit-by-digit LSD (Least Significant Digit) sorting."""
+        if not arr:
+            return []
+
+        negatives = [-x for x in arr if x < 0]
+        positives = [x for x in arr if x >= 0]
+
+        def _sort_positives(nums: list[int]) -> list[int]:
+            if not nums:
+                return []
+            max_num = max(nums)
+            exp = 1
+            while max_num // exp > 0:
+                nums = AllSortingAndSearchingAlgorithms._counting_sort_by_digit(nums, exp)
+                exp *= 10
+            return nums
+
+        sorted_pos = _sort_positives(positives)
+        sorted_neg = _sort_positives(negatives)
+        sorted_neg = [-x for x in reversed(sorted_neg)]
+
+        return sorted_neg + sorted_pos
+
+    @staticmethod
+    def _counting_sort_by_digit(arr: list[int], exp: int) -> list[int]:
+        """Helper for Radix Sort: Stable counting sort based on current digit position (exp)."""
+        n = len(arr)
+        output = [0] * n
+        count = [0] * 10
+
+        for i in range(n):
+            index = (arr[i] // exp) % 10
+            count[index] += 1
+
+        for i in range(1, 10):
+            count[i] += count[i - 1]
+
+        for i in range(n - 1, -1, -1):
+            index = (arr[i] // exp) % 10
+            output[count[index] - 1] = arr[i]
+            count[index] -= 1
+
+        return output
+
+    # =========================================================================
+    # SEARCHING ALGORITHMS
+    # =========================================================================
+
+    # --- 10. LINEAR SEARCH O(n) ---
+    @staticmethod
+    def linear_search(arr: list[int], target: int) -> int:
+        """Linear Search: Sequentially scans list for target value."""
+        for i, num in enumerate(arr):
+            if num == target:
+                return i
+        return -1
+
+    # --- 11. BINARY SEARCH O(log n) ---
+    @staticmethod
+    def binary_search(arr: list[int], target: int) -> int:
+        """Binary Search: Repeatedly halves search space on a SORTED array."""
+        left, right = 0, len(arr) - 1
+
+        while left <= right:
+            mid = (left + right) // 2
+
+            if arr[mid] == target:
+                return mid
+            elif arr[mid] < target:
+                left = mid + 1
+            else:
+                right = mid - 1
+
+        return -1
